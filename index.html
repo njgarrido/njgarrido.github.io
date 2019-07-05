@@ -89,21 +89,21 @@
         var aeropuerto = Object.entries(aeropuertos[i][1]);
         var coordinates = {lat: aeropuerto[5][1][0], lng: aeropuerto[5][1][1]};
 
-        var airportCircle = new google.maps.Circle({
-            strokeColor: '#FF0000',
-            strokeOpacity: 1,
-            strokeWeight: 2,
-            fillColor: '#FF0000',
-            fillOpacity: 0.35,
-            map: map,
-            center: coordinates,
-            radius: 15000,
-          });
+        var airplane = new google.maps.Marker({
+          position: coordinates,
+          icon: "http://maps.google.com/mapfiles/kml/shapes/airports.png",
+          map: map
+        });
       }
     });
+
     var dict = {};
     socket.on('POSITION', ({ code, position }) => {
 <!--      console.log("position", code, position); -->
+
+
+
+
 
 
           if (Object.keys(dict).indexOf(code) == -1){
@@ -116,16 +116,16 @@
 
           if (dict[code][1].length == 0) {
             var coordinates = {lat: position[0], lng: position[1]};
-            var airplane = new google.maps.Circle({
-                strokeColor: '#FFFF00',
-                strokeOpacity: 1,
-                strokeWeight: 2,
-                fillColor: '#FFFF00',
-                fillOpacity: 0.35,
-                map: map,
-                center: coordinates,
-                radius: 4000,
-              });
+
+            var airplane = new google.maps.Marker({
+              position: coordinates,
+              icon: "http://maps.google.com/mapfiles/kml/pal2/icon56.png",
+              map: map
+            });
+
+
+
+
               dict[code][1].push(airplane);
           }
           else {
