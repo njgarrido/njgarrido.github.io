@@ -124,34 +124,35 @@
             });
 
 
-
-
               dict[code][1].push(airplane);
           }
           else {
             var coordinates = {lat: position[0], lng: position[1]};
-            var past_plane = dict[code][1][0];
-            past_plane.setOptions({
-                        fillColor: '#FFFF00',
-                        strokeColor: '#FFFF00',
-                        radius: 4000,
-                        fillOpacity: 0.35,
-                    });
+            var past_coord = dict[code][1][0].coordinates;
 
-            dict[code][1].pop();
-            dict[code][0].push(past_plane);
             var airplane = new google.maps.Circle({
-                strokeColor: '#000000',
+                strokeColor: '#FFFF00',
                 strokeOpacity: 1,
                 strokeWeight: 2,
-                fillColor: '#000000',
+                fillColor: '#FFFF00',
                 fillOpacity: 1,
                 map: map,
-                center: coordinates,
+                center: past_coord,
                 radius: 5000,
               });
 
-              dict[code][1].push(airplane);
+
+
+            dict[code][1].pop();
+            dict[code][0].push(past_plane);
+
+            var airplane = new google.maps.Marker({
+              position: coordinates,
+              icon: "http://maps.google.com/mapfiles/kml/pal2/icon56.png",
+              map: map
+            });
+
+            dict[code][1].push(airplane);
 
 
           }
