@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tarea 4</title>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #map {
+      height: 100%;
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+
+  <body>
+  <div id="map"></div>
+  <script>
+    var map;
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -33.5, lng: -70.5},
+        zoom: 6
+      });
+    }
+
+
+
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBNdLIn5HdqhIb4ETbmBnzzrLjWlJ1wuQ&callback=initMap"
+  async defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script>
+    const socket = io('integracion-tarea-4.herokuapp.com', {
+      path: '/flights'
+    });
+
+    socket.emit('AIRPORTS');
+    socket.emit('FLIGHTS');
+
+    socket.on('connect', () => {
+      console.log('connected');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('disconnected');
+    });
+
+
+
+
+    socket.on('FLIGHTS', payload => {
+
+      console.log("flights", payload);
+      for (i = 0; i < payload.length; i++) {
+
+        var origin = payload[i].origin.airport_position;
+        var dest = payload[i].destination.airport_position;
+        var origin_coordinates = {lat: origin[0], lng: origin[1]};
+        var dest_coordinates = {lat: dest[0], lng: dest[1]};
+
+        var flightPlanCoordinates = [origin_coordinates, dest_coordinates];
+
+        var flightPath = new google.maps.Polyline({
+          path: flightPlanCoordinates,
+          geodesic: true,
+          strokeColor: '#808000',
+          strokeOpacity: 1.0,
+          strokeWeight: 10,
+          map: map,
+        });
+
+
+
+      }
+    });
+
+    socket.on('AIRPORTS', payload => {
+      console.log("airports", payload);
+      var aeropuertos = Object.entries(payload);
+      for (i = 0; i < aeropuertos.length; i++) {
+        var aeropuerto = Object.entries(aeropuertos[i][1]);
+        var coordinates = {lat: aeropuerto[5][1][0], lng: aeropuerto[5][1][1]};
+
+        var airportCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: coordinates,
+            radius: 15000,
+          });
+      }
+    });
+    var dict = {};
+    socket.on('POSITION', ({ code, position }) => {
+<!--      console.log("position", code, position); -->
+
+
+          if (Object.keys(dict).indexOf(code) == -1){
+            var past_pos = [];
+            var actual_pos = [];
+            var value = [past_pos, actual_pos]
+            dict[code] = value;
+          }
+
+
+          if (dict[code][1].length == 0) {
+            var coordinates = {lat: position[0], lng: position[1]};
+            var airplane = new google.maps.Circle({
+                strokeColor: '#FFFF00',
+                strokeOpacity: 1,
+                strokeWeight: 2,
+                fillColor: '#FFFF00',
+                fillOpacity: 0.35,
+                map: map,
+                center: coordinates,
+                radius: 4000,
+              });
+              dict[code][1].push(airplane);
+          }
+          else {
+            var coordinates = {lat: position[0], lng: position[1]};
+            var past_plane = dict[code][1][0];
+            past_plane.setOptions({
+                        fillColor: '#FFFF00',
+                        strokeColor: '#FFFF00',
+                        radius: 4000,
+                        fillOpacity: 0.35,
+                    });
+
+            dict[code][1].pop();
+            dict[code][0].push(past_plane);
+            var airplane = new google.maps.Circle({
+                strokeColor: '#000000',
+                strokeOpacity: 1,
+                strokeWeight: 2,
+                fillColor: '#000000',
+                fillOpacity: 1,
+                map: map,
+                center: coordinates,
+                radius: 5000,
+              });
+
+              dict[code][1].push(airplane);
+
+
+          }
+
+
+    });
+
+
+  </script>
+</body>
+
+</html>
