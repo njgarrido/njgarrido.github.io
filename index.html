@@ -34,7 +34,7 @@
 
 
   </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBNdLIn5HdqhIb4ETbmBnzzrLjWlJ1wuQ&callback=initMap"
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCpjJUBv_LOlvKB2BZzeJx1TPuGmYzgyBo&callback=initMap"
   async defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
   <script>
@@ -120,7 +120,7 @@
             var airplane = new google.maps.Marker({
               position: coordinates,
               icon: "http://maps.google.com/mapfiles/kml/pal2/icon56.png",
-              map: null
+              map: map
             });
 
 
@@ -128,7 +128,7 @@
           }
           else {
             var coordinates = {lat: position[0], lng: position[1]};
-            var past_coord = dict[code][1][0].position;
+            var past_coord = dict[code][1][0].coordinates;
 
             var past_plane = new google.maps.Circle({
                 strokeColor: '#FFFF00',
@@ -141,8 +141,8 @@
                 radius: 5000,
               });
 
-            dict[code][1][0].map = null;
-            console.log(dict[code][1][0]);
+
+
             dict[code][1].pop();
             dict[code][0].push(past_plane);
 
